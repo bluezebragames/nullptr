@@ -6,6 +6,7 @@
 #include "board.hpp"
 using namespace std;
 
+
 class Player {
 
 public:
@@ -16,6 +17,9 @@ public:
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
+
+    Board board;
+    Side ourSide, theirSide;
 };
 
 #endif
