@@ -2,20 +2,33 @@
 #define __PLAYER_H__
 
 #include <iostream>
-#include "common.hpp"
+#include <vector>
+#include <climits>
 #include "board.hpp"
-using namespace std;
 
-class Player {
+class Player
+{
+    public:
+        Player(Side side);
+        ~Player();
 
-public:
-    Player(Side side);
-    ~Player();
+        Move *doMove(Move *opponentsMove, int msLeft);
+        void setBoard(char data[]);
 
-    Move *doMove(Move *opponentsMove, int msLeft);
+        // Flag to tell if the player is running within the test_minimax context
+        bool testingMinimax;
+        
+        // Indicator that tells which side the player is on.
+        Side side;
+        
+        // Indicator that tells which side the opponent is on.
+        Side opponentsSide;
 
-    // Flag to tell if the player is running within the test_minimax context
-    bool testingMinimax;
+    private:
+        int minimax(Board *board, int depth, Side side);
+        
+        // The player's representation of the board.
+        Board *board;
 };
 
 #endif

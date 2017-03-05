@@ -5,21 +5,39 @@
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish
  * within 30 seconds.
  */
-Player::Player(Side side) {
+Player::Player(Side side)
+{
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-
-    /*
-     * TODO: Do any initialization you need to do here (setting up the board,
-     * precalculating things, etc.) However, remember that you will only have
-     * 30 seconds.
-     */
+    board = new Board();
+    this->side = side;
+    
+    if (side == BLACK)
+    {
+        opponentsSide = WHITE;
+    }
+    else if (side == WHITE)
+    {
+        opponentsSide = BLACK;
+    }
 }
 
 /*
  * Destructor for the player.
  */
-Player::~Player() {
+Player::~Player()
+{
+    delete board;
+}
+
+/**
+ * Accessor function for test_minimax.cpp used to set the initial board state.
+ *
+ * @param data The data array that holds the initial board state.
+ */
+void Player::setBoard(char data[])
+{
+    board->setBoard(data);
 }
 
 /*
@@ -35,10 +53,152 @@ Player::~Player() {
  * The move returned must be legal; if there are no valid moves for your side,
  * return nullptr.
  */
-Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
-    return nullptr;
+Move *Player::doMove(Move *opponentsMove, int msLeft)
+{
+    // Mark the opponent's move on the board.
+    board->doMove(opponentsMove, opponentsSide);
+    
+    // Check whether there are valid moves left.
+    if (!board->hasMoves(side))
+    {
+        return nullptr;
+    }
+    
+    std::vector<Move*> possibles = std::vector<Move*>();
+    std::vector<int> values = std::vector<int>();
+    
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            Move *move = new Move(i, j);
+            
+            if (board->checkMove(move, side))
+            {
+                Board *boardCopy = board->copy();
+                boardCopy->doMove(move, side);
+                possibles.push_back(move);
+                values.push_back(minimax(boardCopy, 2, opponentsSide));
+                delete boardCopy;
+            }
+            
+            else
+            {
+                delete move;
+            }
+        }
+    }
+    
+    int maxValue = values[0];
+    unsigned int maxValueIndex = 0;
+    
+    // Find the index of the move that maximized the heuristic value for this
+    // player.
+    for (unsigned int i = 0; i < values.size(); i++)
+    {
+        if (values[i] > maxValue)
+        {
+            maxValue = values[i];
+            maxValueIndex = i;
+        }
+    }
+    
+    // Delete all moves except for the move with the maximum heuristic value.
+    for (unsigned int i = 0; i < values.size(); i++)
+    {
+        if (i != maxValueIndex)
+        {
+            delete possibles[i];
+        }
+    }
+    
+    Move *bestMove = possibles[maxValueIndex];
+    
+    // Mark the player's move on the board.
+    board->doMove(bestMove, side);
+    
+    return bestMove;
+}
+
+/**
+ * Use the minimax algorithm to assign a heuristic value to a node (board
+ * state). At non-terminal nodes of maximum search depth, a heuristic value is
+ * determined by taking the difference of the number of stones that this player
+ * has and the number of stones that the opponent has.
+ *
+ * @param board The board state (node)
+ * @param depth The depth of the node (how many nodes below this node to search)
+ * @param side The side of the player whose turn it is
+ *
+ * @return A heuristic value that represents the favorability of the node, where
+ * larger values denote more favorable odds for this player and smaller values
+ * denote less favorable odds for this player.
+ */
+int Player::minimax(Board *board, int depth, Side side)
+{
+    if (depth == 0 || board->isDone())
+    {
+        // Determine a heuristic value for this move by taking the difference of
+        // the number of stones this player has and the number of stones the
+        // opponent has.
+        return board->count(this->side) - board->count(this->opponentsSide);
+    }
+    
+    // Determine the side of the opponent of the player whose turn it is.
+    Side opponentsSide = (side == BLACK) ? WHITE : BLACK;
+        
+    if (this->side == side)
+    {
+        // It is the turn of this player, the maximizing player in minimax.
+        
+        int bestValue = INT_MIN;
+        
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Move *move = new Move(i, j);
+                
+                if (board->checkMove(move, side))
+                {
+                    Board *boardCopy = board->copy();
+                    boardCopy->doMove(move, side);
+                    int v = minimax(boardCopy, depth - 1, opponentsSide);
+                    bestValue = (v > bestValue) ? v : bestValue;
+                    delete boardCopy;
+                }
+                
+                delete move;
+            }
+        }
+        
+        return bestValue;
+    }
+    else
+    {
+        // It is the turn of the opponent, the minimizing player in minimax.
+        
+        int bestValue = INT_MAX;
+        
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Move *move = new Move(i, j);
+                
+                if (board->checkMove(move, side))
+                {
+                    Board *boardCopy = board->copy();
+                    boardCopy->doMove(move, side);
+                    int v = minimax(boardCopy, depth - 1, opponentsSide);
+                    bestValue = (v < bestValue) ? v : bestValue;
+                    delete boardCopy;
+                }
+                
+                delete move;
+            }
+        }
+        
+        return bestValue;
+    }
 }
