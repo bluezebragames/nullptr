@@ -23,6 +23,8 @@ class Board
         int countWhite();
         void setBoard(char data[]);
 
+        int getHeuristic(Side side, Side otherside);
+
     private:
         bitset<NUM_SPACES> black;
         bitset<NUM_SPACES> taken;

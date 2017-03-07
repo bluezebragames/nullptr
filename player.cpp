@@ -84,7 +84,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
                                          opponentsSide));
                 }
                 else {
-                    values.push_back(minimax(boardCopy, 6, INT_MIN, INT_MAX, \
+                    values.push_back(minimax(boardCopy, 5, INT_MIN, INT_MAX, \
                                          opponentsSide));
                 }
                 delete boardCopy;
@@ -152,10 +152,16 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
 {
     if (depth == 0 || board->isDone())
     {
-        // Determine a heuristic value for this move by taking the difference of
-        // the number of stones this player has and the number of stones the
-        // opponent has.
-        return board->count(this->side) - board->count(this->opponentsSide);
+        if(this->testingMinimax) {
+            // Determine a heuristic value for this move by taking the difference of
+            // the number of stones this player has and the number of stones the
+            // opponent has.
+            return board->count(this->side) - board->count(this->opponentsSide);
+        }
+        else {
+            // Use the special heuristic implemented in board.cpp.
+            return board->getHeuristic(this->side, this->opponentsSide);
+        }
     }
     
     // Determine the side of the opponent of the player whose turn it is.
@@ -179,16 +185,6 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
                     boardCopy->doMove(move, side);
                     int v = minimax(boardCopy, depth - 1, alpha, beta, \
                                     opponentsSide);
-                    if(!this->testingMinimax) {
-                        // improve on heuristics: preference corners
-                        if((i == 0 || i == 7) && (j == 0 || j == 7)) {
-                            v += 7;
-                        } // and depreference squares next to corners
-                        else if((i == 0 || i == 1 || i == 6 || i == 7) &&
-                                (j == 0 || j == 1 || j == 6 || j == 7)) {
-                            v += -7;
-                        }
-                    }
                     delete boardCopy;
                     bestValue = (v > bestValue) ? v : bestValue;
                     alpha = (alpha > bestValue) ? alpha : bestValue;
@@ -225,16 +221,6 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
                     boardCopy->doMove(move, side);
                     int v = minimax(boardCopy, depth - 1, alpha, beta, \
                                     opponentsSide);
-                    if(!this->testingMinimax) {
-                        // improve on heuristics: preference corners
-                        if((i == 0 || i == 7) && (j == 0 || j == 7)) {
-                            v += -7;
-                        } // and depreference squares next to corners
-                        else if((i == 0 || i == 1 || i == 6 || i == 7) &&
-                                (j == 0 || j == 1 || j == 6 || j == 7)) {
-                            v += 7;
-                        }
-                    }
                     delete boardCopy;
                     bestValue = (v < bestValue) ? v : bestValue;
                     beta = (beta < bestValue) ? beta : bestValue;

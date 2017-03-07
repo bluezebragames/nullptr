@@ -221,3 +221,32 @@ void Board::setBoard(char data[])
         }
     }
 }
+
+
+/*
+ * Assigns a value to the current state of the board, from the
+ * perspective of the player 'side.'
+ */
+int Board::getHeuristic(Side side, Side otherside) {
+    int is_black = -1;
+    if(side == BLACK) {
+        is_black = 1;
+    }
+    int score = this->count(side) - this->count(otherside);
+
+    // add points for corner takes
+    if(occupied(0, 0)) {
+        score += black[8 * 0 + 0] ? (is_black * 5) : (is_black * -5);
+    }
+    if(occupied(7, 0)) {
+        score += black[8 * 7 + 0] ? (is_black * 5) : (is_black * -5);
+    }
+    if(occupied(0, 7)) {
+        score += black[8 * 0 + 7] ? (is_black * 5) : (is_black * -5);
+    }
+    if(occupied(7, 7)) {
+        score += black[8 * 7 + 7] ? (is_black * 5) : (is_black * -5);
+    }
+
+    return score;
+}
