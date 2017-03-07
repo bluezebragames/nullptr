@@ -79,19 +79,13 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
                 Board *boardCopy = board->copy();
                 boardCopy->doMove(move, side);
                 possibles.push_back(move);
+            
+                // Use depth 2 for the minimax test and depth 6 in real
+                // gameplay.
+                int depth = testingMinimax ? 2 : 6;
                 
-                if(testingMinimax)
-                {
-                    // Use depth 2 for the minimax test.
-                    values.push_back(minimax(boardCopy, 2, INT_MIN, INT_MAX, \
+                values.push_back(minimax(boardCopy, depth, INT_MIN, INT_MAX, \
                                          opponentsSide));
-                }
-                else
-                {
-                    // Use depth 6 in real gameplay.
-                    values.push_back(minimax(boardCopy, 6, INT_MIN, INT_MAX, \
-                                         opponentsSide));
-                }
                 delete boardCopy;
             }
             
