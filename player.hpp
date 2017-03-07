@@ -25,7 +25,7 @@ class Player
         Side opponentsSide;
 
     private:
-        int minimax(Board *board, int depth, Side side);
+        int minimax(Board *board, int depth, int alpha, int beta, Side side);
         
         // The player's representation of the board.
         Board *board;

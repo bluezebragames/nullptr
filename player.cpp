@@ -78,7 +78,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
                 Board *boardCopy = board->copy();
                 boardCopy->doMove(move, side);
                 possibles.push_back(move);
-                values.push_back(minimax(boardCopy, 2, opponentsSide));
+                values.push_back(minimax(boardCopy, 2, INT_MIN, INT_MAX, \
+                                         opponentsSide));
                 delete boardCopy;
             }
             
@@ -121,20 +122,24 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 }
 
 /**
- * Use the minimax algorithm to assign a heuristic value to a node (board
- * state). At non-terminal nodes of maximum search depth, a heuristic value is
- * determined by taking the difference of the number of stones that this player
- * has and the number of stones that the opponent has.
+ * Use the minimax algorithm with alpha-beta pruning to assign a heuristic value
+ * to a node (board state). At non-terminal nodes of maximum search depth, a
+ * heuristic value is determined by taking the difference of the number of
+ * stones that this player has and the number of stones that the opponent has.
  *
  * @param board The board state (node)
  * @param depth The depth of the node (how many nodes below this node to search)
  * @param side The side of the player whose turn it is
+ * @param alpha The maximum heuristic value that the maximizing player is
+ * assured of
+ * @param beta The minimum heuristic value that the minimizing player is assured
+ * of
  *
  * @return A heuristic value that represents the favorability of the node, where
  * larger values denote more favorable odds for this player and smaller values
  * denote less favorable odds for this player.
  */
-int Player::minimax(Board *board, int depth, Side side)
+int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
 {
     if (depth == 0 || board->isDone())
     {
@@ -163,9 +168,18 @@ int Player::minimax(Board *board, int depth, Side side)
                 {
                     Board *boardCopy = board->copy();
                     boardCopy->doMove(move, side);
-                    int v = minimax(boardCopy, depth - 1, opponentsSide);
-                    bestValue = (v > bestValue) ? v : bestValue;
+                    int v = minimax(boardCopy, depth - 1, alpha, beta, \
+                                    opponentsSide);                    
                     delete boardCopy;
+                    bestValue = (v > bestValue) ? v : bestValue;
+                    alpha = (alpha > bestValue) ? alpha : bestValue;
+                                        
+                    if (beta <= alpha)
+                    {
+                        // This node and all of its children nodes do not need
+                        // to be examined.
+                        break;
+                    }
                 }
                 
                 delete move;
@@ -190,9 +204,18 @@ int Player::minimax(Board *board, int depth, Side side)
                 {
                     Board *boardCopy = board->copy();
                     boardCopy->doMove(move, side);
-                    int v = minimax(boardCopy, depth - 1, opponentsSide);
-                    bestValue = (v < bestValue) ? v : bestValue;
+                    int v = minimax(boardCopy, depth - 1, alpha, beta, \
+                                    opponentsSide);
                     delete boardCopy;
+                    bestValue = (v < bestValue) ? v : bestValue;
+                    beta = (beta < bestValue) ? beta : bestValue;
+                    
+                    if (beta <= alpha)
+                    {
+                        // This node and all of its children nodes do not need
+                        // to be examined.
+                        break;
+                    }
                 }
                 
                 delete move;
