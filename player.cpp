@@ -9,6 +9,7 @@ Player::Player(Side side)
 {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
+    
     board = new Board();
     this->side = side;
     
@@ -78,13 +79,17 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
                 Board *boardCopy = board->copy();
                 boardCopy->doMove(move, side);
                 possibles.push_back(move);
-                // use a different depth for the minimax test and otherwise
-                if(this->testingMinimax) {
+                
+                if(testingMinimax)
+                {
+                    // Use depth 2 for the minimax test.
                     values.push_back(minimax(boardCopy, 2, INT_MIN, INT_MAX, \
                                          opponentsSide));
                 }
-                else {
-                    values.push_back(minimax(boardCopy, 5, INT_MIN, INT_MAX, \
+                else
+                {
+                    // Use depth 6 in real gameplay.
+                    values.push_back(minimax(boardCopy, 6, INT_MIN, INT_MAX, \
                                          opponentsSide));
                 }
                 delete boardCopy;
@@ -111,8 +116,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
         }
     }
 
-    cerr << maxValue << endl;
-
     // Delete all moves except for the move with the maximum heuristic value.
     for (unsigned int i = 0; i < values.size(); i++)
     {
@@ -131,13 +134,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 }
 
 /**
- * Use the minimax algorithm with alpha-beta pruning to assign a heuristic value
- * to a node (board state). At non-terminal nodes of maximum search depth, a
- * heuristic value is determined by taking the difference of the number of
- * stones that this player has and the number of stones that the opponent has.
+ * @brief Use the minimax algorithm with alpha-beta pruning to assign a
+ * heuristic value to a node (board state). At non-terminal nodes of maximum
+ * search depth, a heuristic value is determined by using one of two possible
+ * heuristic functions, depending on whether the algorithm is being tested.
  *
  * @param board The board state (node)
- * @param depth The depth of the node (how many nodes below this node to search)
+ * @param depth The depth of the node (how many levels of nodes below this node
+ * to search)
  * @param side The side of the player whose turn it is
  * @param alpha The maximum heuristic value that the maximizing player is
  * assured of
@@ -152,16 +156,16 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
 {
     if (depth == 0 || board->isDone())
     {
-        if(this->testingMinimax) {
-            // Determine a heuristic value for this move by taking the difference of
-            // the number of stones this player has and the number of stones the
-            // opponent has.
+        if (testingMinimax)
+        {
+            // Use the standard heuristic for the minimax test that is the
+            // difference of the number of stones this player has and the
+            // number of stones the opponent has.
             return board->count(this->side) - board->count(this->opponentsSide);
         }
-        else {
-            // Use the special heuristic implemented in board.cpp.
-            return board->getHeuristic(this->side, this->opponentsSide);
-        }
+
+        // Otherwise, use the special heuristic implemented in board.cpp.
+        return board->getHeuristic(this->side, this->opponentsSide);
     }
     
     // Determine the side of the opponent of the player whose turn it is.

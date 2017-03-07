@@ -223,29 +223,108 @@ void Board::setBoard(char data[])
 }
 
 
-/*
- * Assigns a value to the current state of the board, from the
+/**
+ * @brief Assign a value to the current state of the board from the
  * perspective of the player 'side.'
+ *
+ * @param side The side of the player for which the heuristic is being
+ * evaluated.
+ * @param opponentsSide The side of the opponent of the player for which the
+ * heuristic is being evaluated.
+ *
+ * @return A heuristic value that represents the favorability of the board,
+ * where larger values denote more favorable odds for the player who is on side
+ * 'side' and smaller values denote less favorable odds for the player who is on
+ * side 'side'.
  */
-int Board::getHeuristic(Side side, Side otherside) {
-    int is_black = -1;
-    if(side == BLACK) {
-        is_black = 1;
-    }
-    int score = this->count(side) - this->count(otherside);
+int Board::getHeuristic(Side side, Side opponentsSide)
+{
+    int is_black = (side == BLACK) ? 1 : -1;
+    int score = this->count(side) - this->count(opponentsSide);
 
-    // add points for corner takes
-    if(occupied(0, 0)) {
-        score += black[8 * 0 + 0] ? (is_black * 5) : (is_black * -5);
+    // Add points for corners.
+    
+    if (occupied(0, 0))
+    {
+        score += black[8 * 0 + 0] ? (is_black * CORNER) : (is_black * -CORNER);
     }
-    if(occupied(7, 0)) {
-        score += black[8 * 7 + 0] ? (is_black * 5) : (is_black * -5);
+    if (occupied(7, 0))
+    {
+        score += black[8 * 7 + 0] ? (is_black * CORNER) : (is_black * -CORNER);
     }
-    if(occupied(0, 7)) {
-        score += black[8 * 0 + 7] ? (is_black * 5) : (is_black * -5);
+    if (occupied(0, 7))
+    {
+        score += black[8 * 0 + 7] ? (is_black * CORNER) : (is_black * -CORNER);
     }
-    if(occupied(7, 7)) {
-        score += black[8 * 7 + 7] ? (is_black * 5) : (is_black * -5);
+    if (occupied(7, 7))
+    {
+        score += black[8 * 7 + 7] ? (is_black * CORNER) : (is_black * -CORNER);
+    }
+    
+    // Deduct points for spaces immediately adjacent to a corner.
+    
+    if (occupied(0, 1))
+    {
+        score += black[8 * 0 + 1] ? (is_black * CORNER_ADJ) :
+                                                       (is_black * -CORNER_ADJ);
+    }
+    if (occupied(1, 0))
+    {
+        score += black[8 * 1 + 0] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    if (occupied(1, 1))
+    {
+        score += black[8 * 1 + 1] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    
+    if (occupied(6, 0))
+    {
+        score += black[8 * 6 + 0] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    if (occupied(6, 1))
+    {
+        score += black[8 * 6 + 1] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    if (occupied(7, 1))
+    {
+        score += black[8 * 7 + 1] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    
+    if (occupied(0, 6))
+    {
+        score += black[8 * 0 + 6] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    if (occupied(1, 6))
+    {
+        score += black[8 * 1 + 6] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    if (occupied(1, 7))
+    {
+        score += black[8 * 1 + 7] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    
+    if (occupied(7, 6))
+    {
+        score += black[8 * 7 + 6] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    if (occupied(6, 6))
+    {
+        score += black[8 * 6 + 6] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
+    }
+    if (occupied(6, 7))
+    {
+        score += black[8 * 6 + 7] ? (is_black * CORNER_ADJ) : \
+                                                       (is_black * -CORNER_ADJ);
     }
 
     return score;

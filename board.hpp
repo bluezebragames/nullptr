@@ -1,6 +1,8 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 #define NUM_SPACES 64
+#define CORNER 5
+#define CORNER_ADJ -2
 
 #include <bitset>
 #include "common.hpp"
@@ -22,8 +24,7 @@ class Board
         int countBlack();
         int countWhite();
         void setBoard(char data[]);
-
-        int getHeuristic(Side side, Side otherside);
+        int getHeuristic(Side side, Side opponentsSide);
 
     private:
         bitset<NUM_SPACES> black;
