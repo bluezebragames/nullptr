@@ -78,8 +78,15 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
                 Board *boardCopy = board->copy();
                 boardCopy->doMove(move, side);
                 possibles.push_back(move);
-                values.push_back(minimax(boardCopy, 2, INT_MIN, INT_MAX, \
+                // use a different depth for the minimax test and otherwise
+                if(this->testingMinimax) {
+                    values.push_back(minimax(boardCopy, 2, INT_MIN, INT_MAX, \
                                          opponentsSide));
+                }
+                else {
+                    values.push_back(minimax(boardCopy, 6, INT_MIN, INT_MAX, \
+                                         opponentsSide));
+                }
                 delete boardCopy;
             }
             
@@ -103,7 +110,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
             maxValueIndex = i;
         }
     }
-    
+
+    cerr << maxValue << endl;
+
     // Delete all moves except for the move with the maximum heuristic value.
     for (unsigned int i = 0; i < values.size(); i++)
     {
@@ -169,14 +178,24 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
                     Board *boardCopy = board->copy();
                     boardCopy->doMove(move, side);
                     int v = minimax(boardCopy, depth - 1, alpha, beta, \
-                                    opponentsSide);                    
+                                    opponentsSide);
+                    if(!this->testingMinimax) {
+                        // improve on heuristics: preference corners
+                        if((i == 0 || i == 7) && (j == 0 || j == 7)) {
+                            v += 7;
+                        } // and depreference squares next to corners
+                        else if((i == 0 || i == 1 || i == 6 || i == 7) &&
+                                (j == 0 || j == 1 || j == 6 || j == 7)) {
+                            v += -7;
+                        }
+                    }
                     delete boardCopy;
                     bestValue = (v > bestValue) ? v : bestValue;
                     alpha = (alpha > bestValue) ? alpha : bestValue;
                                         
                     if (beta <= alpha)
                     {
-                        // This node and all of its children nodes do not need
+                        // This node and all of its child nodes do not need
                         // to be examined.
                         break;
                     }
@@ -206,13 +225,23 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
                     boardCopy->doMove(move, side);
                     int v = minimax(boardCopy, depth - 1, alpha, beta, \
                                     opponentsSide);
+                    if(!this->testingMinimax) {
+                        // improve on heuristics: preference corners
+                        if((i == 0 || i == 7) && (j == 0 || j == 7)) {
+                            v += -7;
+                        } // and depreference squares next to corners
+                        else if((i == 0 || i == 1 || i == 6 || i == 7) &&
+                                (j == 0 || j == 1 || j == 6 || j == 7)) {
+                            v += 7;
+                        }
+                    }
                     delete boardCopy;
                     bestValue = (v < bestValue) ? v : bestValue;
                     beta = (beta < bestValue) ? beta : bestValue;
                     
                     if (beta <= alpha)
                     {
-                        // This node and all of its children nodes do not need
+                        // This node and all of its child nodes do not need
                         // to be examined.
                         break;
                     }
