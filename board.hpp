@@ -3,6 +3,7 @@
 #define NUM_SPACES 64
 #define CORNER 5
 #define CORNER_ADJ -2
+#define CORNER_DIAG -5
 
 #include <bitset>
 #include "common.hpp"

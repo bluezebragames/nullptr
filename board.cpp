@@ -275,7 +275,7 @@ int Board::getHeuristic(Side side, Side opponentsSide)
     }
     if (occupied(1, 1))
     {
-        score += black[8 * 1 + 1] ? (is_black * CORNER_ADJ) : \
+        score += black[8 * 1 + 1] ? (is_black * CORNER_DIAG) : \
                                                        (is_black * -CORNER_ADJ);
     }
     
@@ -286,7 +286,7 @@ int Board::getHeuristic(Side side, Side opponentsSide)
     }
     if (occupied(6, 1))
     {
-        score += black[8 * 6 + 1] ? (is_black * CORNER_ADJ) : \
+        score += black[8 * 6 + 1] ? (is_black * CORNER_DIAG) : \
                                                        (is_black * -CORNER_ADJ);
     }
     if (occupied(7, 1))
@@ -302,7 +302,7 @@ int Board::getHeuristic(Side side, Side opponentsSide)
     }
     if (occupied(1, 6))
     {
-        score += black[8 * 1 + 6] ? (is_black * CORNER_ADJ) : \
+        score += black[8 * 1 + 6] ? (is_black * CORNER_DIAG) : \
                                                        (is_black * -CORNER_ADJ);
     }
     if (occupied(1, 7))
@@ -318,7 +318,7 @@ int Board::getHeuristic(Side side, Side opponentsSide)
     }
     if (occupied(6, 6))
     {
-        score += black[8 * 6 + 6] ? (is_black * CORNER_ADJ) : \
+        score += black[8 * 6 + 6] ? (is_black * CORNER_DIAG) : \
                                                        (is_black * -CORNER_ADJ);
     }
     if (occupied(6, 7))
