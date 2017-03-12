@@ -1,14 +1,22 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 #define NUM_SPACES 64
-#define CORNER 5
-#define CORNER_ADJ -2
-#define CORNER_DIAG -5
+#define BOARD_SIZE 8
 
 #include <bitset>
 #include "common.hpp"
 
 using namespace std;
+
+const int HEURISTIC[BOARD_SIZE][BOARD_SIZE] =
+  {{ 100, -20,  10,   5,   5,  10, -20, 100},
+   { -20, -50,  -2,  -2,  -2,  -2, -50, -20},
+   {  10,  -2,  -1,  -1,  -1,  -1,  -2,  10},
+   {   5,  -2,  -1,  -1,  -1,  -1,  -2,   5},
+   {   5,  -2,  -1,  -1,  -1,  -1,  -2,   5},
+   {  10,  -2,  -1,  -1,  -1,  -1,  -2,  10},
+   { -20, -50,  -2,  -2,  -2,  -2, -50, -20},
+   { 100, -20,  10,   5,   5,  10, -20, 100}};
 
 class Board
 {

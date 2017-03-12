@@ -240,91 +240,18 @@ void Board::setBoard(char data[])
 int Board::getHeuristic(Side side, Side opponentsSide)
 {
     int is_black = (side == BLACK) ? 1 : -1;
-    int score = this->count(side) - this->count(opponentsSide);
+    int score = 20*(this->count(side) - this->count(opponentsSide));
 
-    // Add points for corners.
-    
-    if (occupied(0, 0))
-    {
-        score += black[8 * 0 + 0] ? (is_black * CORNER) : (is_black * -CORNER);
-    }
-    if (occupied(7, 0))
-    {
-        score += black[8 * 7 + 0] ? (is_black * CORNER) : (is_black * -CORNER);
-    }
-    if (occupied(0, 7))
-    {
-        score += black[8 * 0 + 7] ? (is_black * CORNER) : (is_black * -CORNER);
-    }
-    if (occupied(7, 7))
-    {
-        score += black[8 * 7 + 7] ? (is_black * CORNER) : (is_black * -CORNER);
-    }
-    
-    // Deduct points for spaces immediately adjacent to a corner.
-    
-    if (occupied(0, 1))
-    {
-        score += black[8 * 0 + 1] ? (is_black * CORNER_ADJ) :
-                                                       (is_black * -CORNER_ADJ);
-    }
-    if (occupied(1, 0))
-    {
-        score += black[8 * 1 + 0] ? (is_black * CORNER_ADJ) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    if (occupied(1, 1))
-    {
-        score += black[8 * 1 + 1] ? (is_black * CORNER_DIAG) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    
-    if (occupied(6, 0))
-    {
-        score += black[8 * 6 + 0] ? (is_black * CORNER_ADJ) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    if (occupied(6, 1))
-    {
-        score += black[8 * 6 + 1] ? (is_black * CORNER_DIAG) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    if (occupied(7, 1))
-    {
-        score += black[8 * 7 + 1] ? (is_black * CORNER_ADJ) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    
-    if (occupied(0, 6))
-    {
-        score += black[8 * 0 + 6] ? (is_black * CORNER_ADJ) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    if (occupied(1, 6))
-    {
-        score += black[8 * 1 + 6] ? (is_black * CORNER_DIAG) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    if (occupied(1, 7))
-    {
-        score += black[8 * 1 + 7] ? (is_black * CORNER_ADJ) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    
-    if (occupied(7, 6))
-    {
-        score += black[8 * 7 + 6] ? (is_black * CORNER_ADJ) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    if (occupied(6, 6))
-    {
-        score += black[8 * 6 + 6] ? (is_black * CORNER_DIAG) : \
-                                                       (is_black * -CORNER_ADJ);
-    }
-    if (occupied(6, 7))
-    {
-        score += black[8 * 6 + 7] ? (is_black * CORNER_ADJ) : \
-                                                       (is_black * -CORNER_ADJ);
+    // square-by-square heuristics
+
+    for(int i = 0; i<BOARD_SIZE; ++i) {
+        for(int j = 0; j<BOARD_SIZE; ++j) {
+            if(occupied(i,j)) {
+                score += black[BOARD_SIZE * i + j] ?
+                    (is_black * HEURISTIC[i][j]) :
+                    (is_black * -1 * HEURISTIC[i][j]);
+            }
+        }
     }
 
     return score;
