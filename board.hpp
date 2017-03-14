@@ -36,18 +36,17 @@ class Board
         int countWhite();
         void setBoard(char data[]);
         int getHeuristic(Side side, Side opponentsSide);
-        bool hasNeighbor(int i, int j, bool is_black);
 
     private:
         bitset<NUM_SPACES> black;
         bitset<NUM_SPACES> taken;
+        int moves_made;
 
         bool occupied(int x, int y);
         bool get(Side side, int x, int y);
         void set(Side side, int x, int y);
         bool onBoard(int x, int y);
-
-        int moves_made = 0;
+        bool hasNeighbor(int i, int j, bool is_black);
 };
 
 #endif

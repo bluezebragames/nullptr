@@ -12,6 +12,8 @@ Board::Board()
     taken.set(4 + 8 * 4);
     black.set(4 + 8 * 3);
     black.set(3 + 8 * 4);
+    
+    moves_made = 0;
 }
 
 /*
@@ -137,8 +139,6 @@ bool Board::checkMove(Move *m, Side side)
  */
 void Board::doMove(Move *m, Side side)
 {
-    // wow we've made another move, might as well add it in
-    moves_made++;
     // A nullptr move means pass.
     if (m == nullptr) return;
 
@@ -182,6 +182,9 @@ void Board::doMove(Move *m, Side side)
     }
     
     set(side, X, Y);
+
+    // wow we've made another move, might as well add it in
+    moves_made++;    
 }
 
 /*
