@@ -29,13 +29,7 @@ Board::~Board()
  */
 Board *Board::copy()
 {
-    Board *newBoard;
-    try {
-        newBoard = new Board();
-    }
-    catch (std::bad_alloc) {
-        cerr << "oh no" << endl;
-    }
+    Board *newBoard = new Board();
     newBoard->black = black;
     newBoard->taken = taken;
     newBoard->moves_made = moves_made;
