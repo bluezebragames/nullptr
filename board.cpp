@@ -1,3 +1,4 @@
+#include <iostream>
 #include "board.hpp"
 
 /*
@@ -26,9 +27,16 @@ Board::~Board()
  */
 Board *Board::copy()
 {
-    Board *newBoard = new Board();
+    Board *newBoard;
+    try {
+        newBoard = new Board();
+    }
+    catch (std::bad_alloc) {
+        cerr << "oh no" << endl;
+    }
     newBoard->black = black;
     newBoard->taken = taken;
+    newBoard->moves_made = moves_made;
     return newBoard;
 }
 
@@ -129,6 +137,8 @@ bool Board::checkMove(Move *m, Side side)
  */
 void Board::doMove(Move *m, Side side)
 {
+    // wow we've made another move, might as well add it in
+    moves_made++;
     // A nullptr move means pass.
     if (m == nullptr) return;
 
@@ -240,19 +250,37 @@ void Board::setBoard(char data[])
 int Board::getHeuristic(Side side, Side opponentsSide)
 {
     int is_black = (side == BLACK) ? 1 : -1;
-    int score = 20*(this->count(side) - this->count(opponentsSide));
+    int score = TOKEN_DIFF_WEIGHT * (this->count(side) - this->count(opponentsSide));
 
-    // square-by-square heuristics
-
-    for(int i = 0; i<BOARD_SIZE; ++i) {
-        for(int j = 0; j<BOARD_SIZE; ++j) {
-            if(occupied(i,j)) {
-                score += black[BOARD_SIZE * i + j] ?
-                    (is_black * HEURISTIC[i][j]) :
-                    (is_black * -1 * HEURISTIC[i][j]);
+    if(moves_made <= 50) { // token diff is the only thing that matters late-game
+        for(int i = 0; i<BOARD_SIZE; ++i) {
+            for(int j = 0; j<BOARD_SIZE; ++j) {
+                if(occupied(i,j)) {
+                    // square-value heuristics
+                    score += black[BOARD_SIZE * i + j] ?
+                             (is_black * HEURISTIC[i][j]) :
+                             (is_black * -1 * HEURISTIC[i][j]);
+                }
+                else {
+                    // frontier squares: subtract 3 for each open square next to one of our pieces
+                    bool has_neighbor = hasNeighbor(i, j, side == BLACK);
+                    score -= NEIGHBOR_PENALTY * has_neighbor;
+                }
             }
         }
     }
 
     return score;
+}
+
+bool Board::hasNeighbor(int i, int j, bool is_black) {
+    for(int k = max(i-1, 0); k<min(i+1, 8); ++k) {
+        for(int l = max(j-1, 0); l<min(j+1, 8); ++l) {
+            if((is_black && black[BOARD_SIZE * k + l]) ||
+               (!is_black && occupied(k, l) && !black[BOARD_SIZE * k + l])) {
+                return true;
+            }
+        }
+    }
+    return false;
 }

@@ -2,6 +2,8 @@
 #define __BOARD_H__
 #define NUM_SPACES 64
 #define BOARD_SIZE 8
+#define TOKEN_DIFF_WEIGHT 20
+#define NEIGHBOR_PENALTY 3
 
 #include <bitset>
 #include "common.hpp"
@@ -34,6 +36,7 @@ class Board
         int countWhite();
         void setBoard(char data[]);
         int getHeuristic(Side side, Side opponentsSide);
+        bool hasNeighbor(int i, int j, bool is_black);
 
     private:
         bitset<NUM_SPACES> black;
@@ -43,6 +46,8 @@ class Board
         bool get(Side side, int x, int y);
         void set(Side side, int x, int y);
         bool onBoard(int x, int y);
+
+        int moves_made = 0;
 };
 
 #endif

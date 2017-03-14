@@ -11,6 +11,7 @@ Player::Player(Side side)
     testingMinimax = false;
     
     board = new Board();
+    cerr << sizeof(*board) << endl;
     this->side = side;
     
     if (side == BLACK)
@@ -82,10 +83,12 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
             
                 // Use depth 2 for the minimax test and depth 6 in real
                 // gameplay.
-                int depth = testingMinimax ? 2 : 6;
-                
+                int depth = testingMinimax ? 2 : 7;
+
+                // no more bad_alloc, we just stop the recursion if it's too much memory used
                 values.push_back(minimax(boardCopy, depth, INT_MIN, INT_MAX, \
                                          opponentsSide));
+
                 delete boardCopy;
             }
             
@@ -179,12 +182,21 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
                 
                 if (board->checkMove(move, side))
                 {
-                    Board *boardCopy = board->copy();
-                    boardCopy->doMove(move, side);
-                    int v = minimax(boardCopy, depth - 1, alpha, beta, \
+                    // no more bad_alloc hopefully
+                    try {
+                        Board *boardCopy = board->copy();
+                        boardCopy->doMove(move, side);
+                        int v = minimax(boardCopy, depth - 1, alpha, beta, \
                                     opponentsSide);
-                    delete boardCopy;
-                    bestValue = (v > bestValue) ? v : bestValue;
+                        delete boardCopy;
+                        bestValue = (v > bestValue) ? v : bestValue;
+                    }
+                    catch (std::bad_alloc) {
+                        cerr << "one";
+                        delete move;
+                        return bestValue;
+                    }
+
                     alpha = (alpha > bestValue) ? alpha : bestValue;
                                         
                     if (beta <= alpha)
@@ -215,12 +227,21 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
                 
                 if (board->checkMove(move, side))
                 {
-                    Board *boardCopy = board->copy();
-                    boardCopy->doMove(move, side);
-                    int v = minimax(boardCopy, depth - 1, alpha, beta, \
+                    // no more bad_alloc hopefully
+                    try {
+                        Board *boardCopy = board->copy();
+                        boardCopy->doMove(move, side);
+                        int v = minimax(boardCopy, depth - 1, alpha, beta, \
                                     opponentsSide);
-                    delete boardCopy;
-                    bestValue = (v < bestValue) ? v : bestValue;
+                        delete boardCopy;
+                        bestValue = (v < bestValue) ? v : bestValue;
+                    }
+                    catch (std::bad_alloc) {
+                        cerr << "two";
+                        delete move;
+                        return bestValue;
+                    }
+
                     beta = (beta < bestValue) ? beta : bestValue;
                     
                     if (beta <= alpha)
