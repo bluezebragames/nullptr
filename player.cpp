@@ -79,9 +79,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
                 Board *boardCopy = board->copy();
                 boardCopy->doMove(move, side);
 
-                // Use depth 2 for the minimax test and depth 5 in real
+                // Use depth 2 for the minimax test and depth 6 in real
                 // gameplay.
-                int depth = testingMinimax ? 2 : 5;
+                int depth = testingMinimax ? 2 : 6;
 
                 // no more bad_alloc, we just stop the recursion if it's too much memory used
                 int currentValue = minimax(boardCopy, depth, INT_MIN, INT_MAX, opponentsSide);
