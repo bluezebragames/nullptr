@@ -65,10 +65,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     {
         return nullptr;
     }
-    
-    std::vector<Move*> possibles = std::vector<Move*>();
-    std::vector<int> values = std::vector<int>();
-    
+
+    Move *bestMove = nullptr;
+    int bestValue = INT_MIN;
+
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -79,19 +79,23 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
             {
                 Board *boardCopy = board->copy();
                 boardCopy->doMove(move, side);
-                possibles.push_back(move);
-            
+
                 // Use depth 2 for the minimax test and depth 6 in real
                 // gameplay.
-                int depth = testingMinimax ? 2 : 7;
+                int depth = testingMinimax ? 2 : 6;
 
                 // no more bad_alloc, we just stop the recursion if it's too much memory used
-                values.push_back(minimax(boardCopy, depth, INT_MIN, INT_MAX, \
-                                         opponentsSide));
+                int currentValue = minimax(boardCopy, depth, INT_MIN, INT_MAX, opponentsSide);
+
+                if(currentValue > bestValue || bestValue == INT_MIN) {
+                    bestValue = currentValue;
+                    bestMove = new Move(i, j);
+                    delete move;
+                }
 
                 delete boardCopy;
             }
-            
+
             else
             {
                 delete move;
@@ -99,32 +103,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
         }
     }
     
-    int maxValue = values[0];
-    unsigned int maxValueIndex = 0;
-    
-    // Find the index of the move that maximized the heuristic value for this
-    // player.
-    for (unsigned int i = 0; i < values.size(); i++)
-    {
-        if (values[i] > maxValue)
-        {
-            maxValue = values[i];
-            maxValueIndex = i;
-        }
-    }
-
-    // Delete all moves except for the move with the maximum heuristic value.
-    for (unsigned int i = 0; i < values.size(); i++)
-    {
-        if (i != maxValueIndex)
-        {
-            delete possibles[i];
-        }
-    }
-    
-    Move *bestMove = possibles[maxValueIndex];
-    
-    // Mark the player's move on the board.
     board->doMove(bestMove, side);
     
     return bestMove;
