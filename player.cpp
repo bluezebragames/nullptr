@@ -11,7 +11,6 @@ Player::Player(Side side)
     testingMinimax = false;
     
     board = new Board();
-    cerr << sizeof(*board) << endl;
     this->side = side;
     
     if (side == BLACK)
@@ -170,7 +169,6 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
                         bestValue = (v > bestValue) ? v : bestValue;
                     }
                     catch (std::bad_alloc) {
-                        cerr << "one";
                         delete move;
                         return bestValue;
                     }
@@ -215,7 +213,6 @@ int Player::minimax(Board *board, int depth, int alpha, int beta, Side side)
                         bestValue = (v < bestValue) ? v : bestValue;
                     }
                     catch (std::bad_alloc) {
-                        cerr << "two";
                         delete move;
                         return bestValue;
                     }
