@@ -34,7 +34,6 @@ Board *Board::copy()
         newBoard = new Board();
     }
     catch (std::bad_alloc) {
-        cerr << "oh no" << endl;
     }
     newBoard->black = black;
     newBoard->taken = taken;
